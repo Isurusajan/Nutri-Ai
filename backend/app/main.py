@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
+from app.api.v1.scan import router as scan_router
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -22,6 +23,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Register API v1 Routers
+app.include_router(scan_router, prefix=settings.API_V1_STR)
 
 @app.get("/", tags=["Health Check"])
 def root():
