@@ -1,0 +1,254 @@
+[
+  {
+    "code": "E211",
+    "name": "Sodium Benzoate",
+    "category": "Preservative",
+    "synonyms": ["sodium benzoate", "benzoate of soda", "benzoic acid sodium salt", "e211", "ins 211", "e-211"],
+    "common_uses": ["Carbonated beverages", "fruit squashes", "pickles", "salad dressings"],
+    "hazard_weight": 0.65,
+    "pediatric_concern_tags": ["hyperactivity_interaction", "asthma_sensitivity", "urticaria"]
+  },
+  {
+    "code": "E110",
+    "name": "Sunset Yellow FCF",
+    "category": "Artificial Colorant (Azo Dye)",
+    "synonyms": ["sunset yellow", "fd&c yellow no. 6", "yellow 6", "e110", "orange yellow s", "ins 110", "e-110", "ci 15985"],
+    "common_uses": ["Sweets", "cordials", "snack foods", "jellies", "ice cream"],
+    "hazard_weight": 0.75,
+    "pediatric_concern_tags": ["hyperactivity_interaction", "urticaria", "asthma_sensitivity"]
+  },
+  {
+    "code": "E102",
+    "name": "Tartrazine",
+    "category": "Artificial Colorant (Azo Dye)",
+    "synonyms": ["tartrazine", "fd&c yellow no. 5", "yellow 5", "e102", "ins 102", "e-102", "ci 19140"],
+    "common_uses": ["Flavored chips", "dessert powders", "candies", "soft drinks", "cereals"],
+    "hazard_weight": 0.78,
+    "pediatric_concern_tags": ["allergic_hypersensitivity", "hyperactivity_interaction", "asthma_sensitivity"]
+  },
+  {
+    "code": "E122",
+    "name": "Carmoisine (Azorubine)",
+    "category": "Artificial Colorant (Azo Dye)",
+    "synonyms": ["carmoisine", "azorubine", "e122", "ins 122", "e-122", "ci 14720"],
+    "common_uses": ["Jellies", "confectionery", "cakes", "soft drinks"],
+    "hazard_weight": 0.72,
+    "pediatric_concern_tags": ["hyperactivity_interaction", "asthma_sensitivity"]
+  },
+  {
+    "code": "E124",
+    "name": "Ponceau 4R (Cochineal Red A)",
+    "category": "Artificial Colorant (Azo Dye)",
+    "synonyms": ["ponceau 4r", "cochineal red a", "brilliant scarlet", "e124", "ins 124", "e-124"],
+    "common_uses": ["Dessert mixes", "confectionery", "canned fruit", "soda"],
+    "hazard_weight": 0.74,
+    "pediatric_concern_tags": ["hyperactivity_interaction", "allergic_reaction"]
+  },
+  {
+    "code": "E129",
+    "name": "Allura Red AC",
+    "category": "Artificial Colorant (Azo Dye)",
+    "synonyms": ["allura red", "fd&c red no. 40", "red 40", "e129", "ins 129", "e-129", "ci 16035"],
+    "common_uses": ["Candies", "fruit snacks", "baked goods", "beverages"],
+    "hazard_weight": 0.75,
+    "pediatric_concern_tags": ["hyperactivity_interaction", "allergic_reaction", "hyperactivity"]
+  },
+  {
+    "code": "E104",
+    "name": "Quinoline Yellow",
+    "category": "Artificial Colorant",
+    "synonyms": ["quinoline yellow", "food yellow 13", "e104", "ins 104", "e-104"],
+    "common_uses": ["Ice lollies", "pastilles", "smoked fish", "soft drinks"],
+    "hazard_weight": 0.70,
+    "pediatric_concern_tags": ["hyperactivity_interaction", "asthma_sensitivity"]
+  },
+  {
+    "code": "E133",
+    "name": "Brilliant Blue FCF",
+    "category": "Artificial Colorant",
+    "synonyms": ["brilliant blue", "fd&c blue no. 1", "blue 1", "e133", "ins 133", "e-133"],
+    "common_uses": ["Blue raspberry drinks", "candies", "icings", "popsicles"],
+    "hazard_weight": 0.55,
+    "pediatric_concern_tags": ["allergic_sensitization"]
+  },
+  {
+    "code": "E621",
+    "name": "Monosodium Glutamate",
+    "category": "Flavor Enhancer",
+    "synonyms": ["monosodium glutamate", "msg", "sodium glutamate", "e621", "ins 621", "e-621", "flavor enhancer 621"],
+    "common_uses": ["Savory snacks", "seasonings", "instant noodles", "processed meat", "chips"],
+    "hazard_weight": 0.60,
+    "pediatric_concern_tags": ["glutamate_sensitivity", "headache_trigger", "bronchospasm_trigger"]
+  },
+  {
+    "code": "E627",
+    "name": "Disodium Guanylate",
+    "category": "Flavor Enhancer",
+    "synonyms": ["disodium guanylate", "sodium guanylate", "e627", "ins 627", "e-627"],
+    "common_uses": ["Potato chips", "packet soups", "sauces"],
+    "hazard_weight": 0.45,
+    "pediatric_concern_tags": ["uric_acid_caution", "glutamate_potentiator"]
+  },
+  {
+    "code": "E631",
+    "name": "Disodium Inosinate",
+    "category": "Flavor Enhancer",
+    "synonyms": ["disodium inosinate", "sodium inosinate", "e631", "ins 631", "e-631"],
+    "common_uses": ["Savory crackers", "instant noodles", "seasoned nuts"],
+    "hazard_weight": 0.45,
+    "pediatric_concern_tags": ["glutamate_potentiator"]
+  },
+  {
+    "code": "E250",
+    "name": "Sodium Nitrite",
+    "category": "Preservative",
+    "synonyms": ["sodium nitrite", "nitrite of soda", "e250", "ins 250", "e-250"],
+    "common_uses": ["Cured sausages", "hot dogs", "bacon", "preserved meats", "ham"],
+    "hazard_weight": 0.85,
+    "pediatric_concern_tags": ["nitrosamine_precursor", "infant_methemoglobinemia", "carcinogenic_potential"]
+  },
+  {
+    "code": "E251",
+    "name": "Sodium Nitrate",
+    "category": "Preservative",
+    "synonyms": ["sodium nitrate", "chile saltpeter", "e251", "ins 251", "e-251"],
+    "common_uses": ["Cured meat products", "hard cheeses"],
+    "hazard_weight": 0.70,
+    "pediatric_concern_tags": ["nitrosamine_precursor"]
+  },
+  {
+    "code": "E220",
+    "name": "Sulfur Dioxide",
+    "category": "Preservative / Sulfite",
+    "synonyms": ["sulfur dioxide", "sulphur dioxide", "e220", "ins 220", "e-220"],
+    "common_uses": ["Dried fruits", "fruit juices", "wine", "vinegars"],
+    "hazard_weight": 0.80,
+    "pediatric_concern_tags": ["severe_asthma_bronchospasm", "sulfite_allergy"]
+  },
+  {
+    "code": "E223",
+    "name": "Sodium Metabisulfite",
+    "category": "Preservative / Sulfite",
+    "synonyms": ["sodium metabisulfite", "sodium metabisulphite", "e223", "ins 223", "e-223"],
+    "common_uses": ["Biscuits", "pickles", "fruit purées", "beer"],
+    "hazard_weight": 0.82,
+    "pediatric_concern_tags": ["severe_asthma_bronchospasm", "sulfite_allergy"]
+  },
+  {
+    "code": "E200",
+    "name": "Sorbic Acid",
+    "category": "Preservative",
+    "synonyms": ["sorbic acid", "e200", "ins 200", "e-200"],
+    "common_uses": ["Cheese", "baked products", "dips", "spreads"],
+    "hazard_weight": 0.25,
+    "pediatric_concern_tags": ["contact_dermatitis_rare"]
+  },
+  {
+    "code": "E202",
+    "name": "Potassium Sorbate",
+    "category": "Preservative",
+    "synonyms": ["potassium sorbate", "sorbate of potassium", "e202", "ins 202", "e-202"],
+    "common_uses": ["Yogurt", "soft drinks", "baked goods", "sauces", "jams"],
+    "hazard_weight": 0.28,
+    "pediatric_concern_tags": ["low_pediatric_hazard"]
+  },
+  {
+    "code": "E300",
+    "name": "Ascorbic Acid",
+    "category": "Antioxidant / Vitamin C",
+    "synonyms": ["ascorbic acid", "vitamin c", "l-ascorbic acid", "e300", "ins 300", "e-300"],
+    "common_uses": ["Fruit products", "beverages", "flour treatment", "baby food"],
+    "hazard_weight": 0.10,
+    "pediatric_concern_tags": ["protective_antioxidant", "benzene_interaction_risk_with_e211"]
+  },
+  {
+    "code": "E330",
+    "name": "Citric Acid",
+    "category": "Acidity Regulator",
+    "synonyms": ["citric acid", "e330", "ins 330", "e-330"],
+    "common_uses": ["Soft drinks", "candies", "canned tomatoes", "jellies"],
+    "hazard_weight": 0.12,
+    "pediatric_concern_tags": ["dental_erosion_high_intake", "generally_recognized_safe"]
+  },
+  {
+    "code": "E320",
+    "name": "Butylated Hydroxyanisole (BHA)",
+    "category": "Antioxidant",
+    "synonyms": ["bha", "butylated hydroxyanisole", "e320", "ins 320", "e-320"],
+    "common_uses": ["Chewing gum", "potato crisps", "margarine", "instant noodles"],
+    "hazard_weight": 0.72,
+    "pediatric_concern_tags": ["endocrine_disruptor_concern", "carcinogenicity_animal_studies"]
+  },
+  {
+    "code": "E321",
+    "name": "Butylated Hydroxytoluene (BHT)",
+    "category": "Antioxidant",
+    "synonyms": ["bht", "butylated hydroxytoluene", "e321", "ins 321", "e-321"],
+    "common_uses": ["Breakfast cereals", "snack foods", "vegetable oils"],
+    "hazard_weight": 0.70,
+    "pediatric_concern_tags": ["hyperactivity_anecdotal", "liver_enzyme_induction"]
+  },
+  {
+    "code": "E951",
+    "name": "Aspartame",
+    "category": "Artificial Sweetener",
+    "synonyms": ["aspartame", "nutrasweet", "equal", "e951", "ins 951", "e-951"],
+    "common_uses": ["Diet sodas", "sugar-free gum", "sugar-free yogurts", "desserts"],
+    "hazard_weight": 0.68,
+    "pediatric_concern_tags": ["phenylketonuria_contraindication", "neurobehavioral_reports", "gut_microbiome_alteration"]
+  },
+  {
+    "code": "E950",
+    "name": "Acesulfame Potassium",
+    "category": "Artificial Sweetener",
+    "synonyms": ["acesulfame k", "acesulfame potassium", "ace-k", "e950", "ins 950", "e-950"],
+    "common_uses": ["Sugar-free beverages", "baked products", "candies"],
+    "hazard_weight": 0.62,
+    "pediatric_concern_tags": ["pediatric_metabolic_effect"]
+  },
+  {
+    "code": "E955",
+    "name": "Sucralose",
+    "category": "Artificial Sweetener",
+    "synonyms": ["sucralose", "splenda", "e955", "ins 955", "e-955"],
+    "common_uses": ["Flavored water", "baking mixes", "diet syrups", "snacks"],
+    "hazard_weight": 0.48,
+    "pediatric_concern_tags": ["gut_microbiota_modulation"]
+  },
+  {
+    "code": "E407",
+    "name": "Carrageenan",
+    "category": "Thickener / Stabilizer",
+    "synonyms": ["carrageenan", "irish moss extract", "e407", "ins 407", "e-407"],
+    "common_uses": ["Chocolate milk", "ice cream", "infant formulas", "puddings"],
+    "hazard_weight": 0.58,
+    "pediatric_concern_tags": ["pediatric_gut_inflammation", "gastrointestinal_distress"]
+  },
+  {
+    "code": "E440",
+    "name": "Pectin",
+    "category": "Gelling Agent",
+    "synonyms": ["pectin", "apple pectin", "citrus pectin", "e440", "ins 440", "e-440"],
+    "common_uses": ["Jams", "fruit preparations", "gummy candies"],
+    "hazard_weight": 0.05,
+    "pediatric_concern_tags": ["dietary_fiber", "safe"]
+  },
+  {
+    "code": "E162",
+    "name": "Beetroot Red (Betanin)",
+    "category": "Natural Colorant",
+    "synonyms": ["beetroot red", "betanin", "beet red", "e162", "ins 162", "e-162"],
+    "common_uses": ["Strawberry milk", "ice cream", "yogurt", "fruit sauces"],
+    "hazard_weight": 0.05,
+    "pediatric_concern_tags": ["natural_extract", "safe"]
+  },
+  {
+    "code": "E160a",
+    "name": "Beta-Carotene",
+    "category": "Natural Colorant / Provitamin",
+    "synonyms": ["beta-carotene", "carotenes", "e160a", "ins 160a", "e-160a"],
+    "common_uses": ["Margarine", "cheese", "juices", "baked goods"],
+    "hazard_weight": 0.05,
+    "pediatric_concern_tags": ["provitamin_a", "safe"]
+  }
+]
