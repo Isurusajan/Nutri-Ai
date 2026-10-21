@@ -4,14 +4,14 @@ import { HomeScreen } from './src/screens/HomeScreen';
 import { ScanResultScreen } from './src/screens/ScanResultScreen';
 import { ChildProfileScreen } from './src/screens/ChildProfileScreen';
 import { HistoryScreen } from './src/screens/HistoryScreen';
-import { InfoScreen } from './src/screens/InfoScreen';
-import { Camera, Clock, User, Info } from 'lucide-react-native';
+import { SettingsScreen } from './src/screens/SettingsScreen';
+import { Camera, Clock, User, Settings } from 'lucide-react-native';
 import { ScanAssessmentResponse } from './src/api/client';
 import { AppIntroSplash } from './src/components/AppIntroSplash';
 
 export default function App() {
   const [showSplash, setShowSplash] = useState(true);
-  const [activeTab, setActiveTab] = useState<'scan' | 'history' | 'profile' | 'info'>('scan');
+  const [activeTab, setActiveTab] = useState<'scan' | 'history' | 'profile' | 'settings'>('scan');
   const [currentResult, setCurrentResult] = useState<{ result: ScanAssessmentResponse; imageUri?: string } | null>(null);
 
   const handleOpenResult = (res: ScanAssessmentResponse, imageUri?: string) => {
@@ -49,8 +49,11 @@ export default function App() {
             {activeTab === 'profile' && (
               <ChildProfileScreen onBack={() => setActiveTab('scan')} />
             )}
-            {activeTab === 'info' && (
-              <InfoScreen onReplayIntro={() => setShowSplash(true)} />
+            {activeTab === 'settings' && (
+              <SettingsScreen
+                onReplayIntro={() => setShowSplash(true)}
+                onNavigateToProfile={() => setActiveTab('profile')}
+              />
             )}
           </>
         )}
@@ -116,19 +119,19 @@ export default function App() {
 
             <TouchableOpacity
               style={styles.navTab}
-              onPress={() => setActiveTab('info')}
+              onPress={() => setActiveTab('settings')}
             >
-              <Info
+              <Settings
                 size={22}
-                color={activeTab === 'info' ? '#0d9488' : '#94a3b8'}
+                color={activeTab === 'settings' ? '#0d9488' : '#94a3b8'}
               />
               <Text
                 style={[
                   styles.navLabel,
-                  activeTab === 'info' && styles.navLabelActive,
+                  activeTab === 'settings' && styles.navLabelActive,
                 ]}
               >
-                About
+                Settings
               </Text>
             </TouchableOpacity>
           </View>

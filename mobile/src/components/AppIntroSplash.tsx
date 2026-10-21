@@ -185,7 +185,7 @@ export function AppIntroSplash({ onFinish }: AppIntroSplashProps) {
       {/* Top Header / Skip Row */}
       <View style={styles.topBar}>
         <View style={styles.academicBadge}>
-          <Text style={styles.academicBadgeText}>Univ. of Moratuwa • BIT FYP</Text>
+          <Text style={styles.academicBadgeText}>Pediatric Food Safety AI</Text>
         </View>
 
         <TouchableOpacity onPress={handleExit} style={styles.skipButton} activeOpacity={0.7}>
@@ -223,10 +223,6 @@ export function AppIntroSplash({ onFinish }: AppIntroSplashProps) {
               style={styles.logoImage}
               resizeMode="contain"
             />
-            {/* Corner AI Sparkle Badge */}
-            <View style={styles.sparkleBadge}>
-              <Sparkles size={15} color="#fef08a" />
-            </View>
           </View>
         </Animated.View>
 

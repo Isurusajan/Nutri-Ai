@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet, Platform, StatusBar, TouchableOpacity } from 'react-native';
-import { ShieldCheck, Sparkles, Activity } from 'lucide-react-native';
+import { View, Text, StyleSheet, Platform, StatusBar, TouchableOpacity, Image } from 'react-native';
+import { Sparkles, Activity } from 'lucide-react-native';
 
 interface BrandHeaderProps {
   subtitle?: string;
@@ -24,10 +24,11 @@ export function NutriSafeBrandHeader({
           style={styles.brandCluster}
         >
           <View style={styles.logoBadge}>
-            <ShieldCheck size={24} color="#ffffff" />
-            <View style={styles.logoSparkleDot}>
-              <Sparkles size={11} color="#fef08a" />
-            </View>
+            <Image
+              source={require('../../assets/icon.png')}
+              style={styles.logoImage}
+              resizeMode="cover"
+            />
           </View>
           <View style={styles.titleWrap}>
             <View style={styles.nameRow}>
@@ -82,11 +83,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
+    overflow: 'visible',
     shadowColor: '#0d9488',
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.25,
     shadowRadius: 5,
     elevation: 4,
+  },
+  logoImage: {
+    width: 44,
+    height: 44,
+    borderRadius: 13,
   },
   logoSparkleDot: {
     position: 'absolute',

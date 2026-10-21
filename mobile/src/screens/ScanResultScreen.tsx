@@ -41,7 +41,7 @@ import {
   ChevronUp,
 } from 'lucide-react-native';
 import { ScanAssessmentResponse, ParsedIngredientItem } from '../api/client';
-import { useAppStore } from '../store/useAppStore';
+import { useAppStore, useActiveChild, getFoodItemImageUri } from '../store/useAppStore';
 
 const { width } = Dimensions.get('window');
 
@@ -52,7 +52,8 @@ interface ScanResultScreenProps {
 }
 
 export function ScanResultScreen({ result, onBack, imageUri }: ScanResultScreenProps) {
-  const activeChild = useAppStore((state) => state.getActiveChild());
+  const activeChild = useActiveChild();
+  const displayImage = getFoodItemImageUri(result.product_name || '', imageUri);
 
   const [savedBookmark, setSavedBookmark] = useState(false);
   const [showAllText, setShowAllText] = useState(false);
@@ -277,8 +278,8 @@ export function ScanResultScreen({ result, onBack, imageUri }: ScanResultScreenP
           <View style={styles.heroRow}>
             {/* Packaging Image Thumbnail */}
             <View style={styles.productThumbWrap}>
-              {imageUri ? (
-                <Image source={{ uri: imageUri }} style={styles.productThumb} resizeMode="cover" />
+              {displayImage ? (
+                <Image source={{ uri: displayImage }} style={styles.productThumb} resizeMode="contain" />
               ) : (
                 <View style={styles.productThumbPlaceholder}>
                   <Cookie size={36} color="#0d9488" />
@@ -765,10 +766,13 @@ const styles = StyleSheet.create({
     width: 76,
     height: 94,
     borderRadius: 14,
-    backgroundColor: '#f1f5f9',
+    backgroundColor: '#ffffff',
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: '#e2e8f0',
+    padding: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   productThumb: {
     width: '100%',

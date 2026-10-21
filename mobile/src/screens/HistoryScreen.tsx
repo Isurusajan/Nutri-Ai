@@ -1,13 +1,13 @@
 import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView, SafeAreaView, StatusBar } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, SafeAreaView, StatusBar, Image } from 'react-native';
 import { Clock, ShieldAlert, CheckCircle, AlertTriangle, ChevronRight, TrendingUp, Calendar, Sparkles } from 'lucide-react-native';
 import { NutriSafeBrandHeader } from '../components/NutriSafeBrandHeader';
-import { useAppStore } from '../store/useAppStore';
+import { useActiveChild, useActiveChildHistory, use7DayExposureIndex, getFoodItemImageUri } from '../store/useAppStore';
 
-export function HistoryScreen({ onSelectScan }: { onSelectScan: (item: any) => void }) {
-  const activeChild = useAppStore((state) => state.getActiveChild());
-  const history = useAppStore((state) => state.getHistoryForActiveChild());
-  const exposureIndex = useAppStore((state) => state.get7DayExposureIndex());
+export function HistoryScreen({ onSelectScan }: { onSelectScan: (item: any, imageUri?: string) => void }) {
+  const activeChild = useActiveChild();
+  const history = useActiveChildHistory();
+  const exposureIndex = use7DayExposureIndex();
 
   return (
     <SafeAreaView style={styles.container}>
@@ -60,31 +60,45 @@ export function HistoryScreen({ onSelectScan }: { onSelectScan: (item: any) => v
             </Text>
           </View>
         ) : (
-          history.map((item) => (
-            <TouchableOpacity
-              key={item.id}
-              style={styles.card}
-              onPress={() => onSelectScan(item.fullAssessment)}
-            >
-              <View style={[styles.badgeStrip, { backgroundColor: item.color }]} />
-              <View style={styles.cardContent}>
-                <View style={styles.rowTop}>
-                  <Text style={styles.productName} numberOfLines={1}>{item.productName}</Text>
-                  <Text style={[styles.scoreBadge, { color: item.color }]}>{item.score}/100</Text>
+          history.map((item) => {
+            const itemImg = getFoodItemImageUri(item.productName, item.imageUri);
+            return (
+              <TouchableOpacity
+                key={item.id}
+                style={styles.card}
+                onPress={() => onSelectScan(item.fullAssessment, item.imageUri || itemImg)}
+                activeOpacity={0.7}
+              >
+                <View style={[styles.badgeStrip, { backgroundColor: item.color }]} />
+
+                {/* Product Image Thumbnail */}
+                <View style={styles.recentThumbWrap}>
+                  <Image
+                    source={{ uri: itemImg }}
+                    style={styles.recentThumbImage}
+                    resizeMode="contain"
+                  />
                 </View>
 
-                <Text style={styles.dateText}>{item.date}</Text>
+                <View style={styles.cardContent}>
+                  <View style={styles.rowTop}>
+                    <Text style={styles.productName} numberOfLines={1}>{item.productName}</Text>
+                    <Text style={[styles.scoreBadge, { color: item.color }]}>{item.score}/100</Text>
+                  </View>
 
-                <View style={styles.rowBottom}>
-                  <Text style={[styles.categoryText, { color: item.color }]}>
-                    {item.category}
-                  </Text>
-                  <Text style={styles.flagText} numberOfLines={1}>• {item.flag}</Text>
+                  <Text style={styles.dateText}>{item.date}</Text>
+
+                  <View style={styles.rowBottom}>
+                    <Text style={[styles.categoryText, { color: item.color }]}>
+                      {item.category}
+                    </Text>
+                    <Text style={styles.flagText} numberOfLines={1}>• {item.flag}</Text>
+                  </View>
                 </View>
-              </View>
-              <ChevronRight size={18} color="#94a3b8" />
-            </TouchableOpacity>
-          ))
+                <ChevronRight size={18} color="#94a3b8" />
+              </TouchableOpacity>
+            );
+          })
         )}
       </ScrollView>
     </SafeAreaView>
@@ -106,9 +120,26 @@ const styles = StyleSheet.create({
   barVisualWrap: { height: 8, backgroundColor: '#f1f5f9', borderRadius: 4, marginTop: 12, overflow: 'hidden' },
   barFill: { height: '100%', borderRadius: 4 },
   listHeading: { fontSize: 15, fontWeight: '700', color: '#0f172a', marginBottom: 12 },
-  card: { backgroundColor: '#ffffff', borderRadius: 14, borderWidth: 1, borderColor: '#e2e8f0', flexDirection: 'row', alignItems: 'center', padding: 14, marginBottom: 10, overflow: 'hidden' },
+  card: { backgroundColor: '#ffffff', borderRadius: 14, borderWidth: 1, borderColor: '#e2e8f0', flexDirection: 'row', alignItems: 'center', padding: 12, marginBottom: 10, overflow: 'hidden' },
   badgeStrip: { width: 4, height: '100%', position: 'absolute', left: 0, top: 0, bottom: 0 },
-  cardContent: { flex: 1, marginLeft: 8 },
+  recentThumbWrap: {
+    width: 50,
+    height: 50,
+    borderRadius: 12,
+    overflow: 'hidden',
+    backgroundColor: '#ffffff',
+    marginLeft: 8,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    padding: 2,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  recentThumbImage: {
+    width: '100%',
+    height: '100%',
+  },
+  cardContent: { flex: 1, marginLeft: 10 },
   rowTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   productName: { fontSize: 14, fontWeight: '700', color: '#0f172a', flex: 1, marginRight: 8 },
   scoreBadge: { fontSize: 13, fontWeight: '800' },

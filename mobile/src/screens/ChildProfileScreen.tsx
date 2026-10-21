@@ -3,10 +3,10 @@ import { StyleSheet, Text, View, TouchableOpacity, ScrollView, SafeAreaView, Sta
 import { ArrowLeft, User, Plus, X, Heart, Shield, Check, Stethoscope, Sparkles, UserPlus, Camera as CameraIcon, Trash2, RotateCcw } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as Haptics from 'expo-haptics';
-import { useAppStore } from '../store/useAppStore';
+import { useAppStore, useActiveChild } from '../store/useAppStore';
 
 export function ChildProfileScreen({ onBack }: { onBack: () => void }) {
-  const activeChild = useAppStore((state) => state.getActiveChild());
+  const activeChild = useActiveChild();
   const allChildren = useAppStore((state) => state.children);
   const setActiveChild = useAppStore((state) => state.setActiveChild);
   const updateActiveChild = useAppStore((state) => state.updateActiveChild);
@@ -21,6 +21,7 @@ export function ChildProfileScreen({ onBack }: { onBack: () => void }) {
   const [name, setName] = useState(activeChild.name);
   const [dob, setDob] = useState(activeChild.birthDate);
   const [pediatrician, setPediatrician] = useState(activeChild.linkedPediatrician);
+  const [avatarUri, setAvatarUri] = useState<string | undefined>(activeChild.avatarUri);
   const [newAllergyInput, setNewAllergyInput] = useState('');
   const [newConditionInput, setNewConditionInput] = useState('');
 
@@ -41,10 +42,16 @@ export function ChildProfileScreen({ onBack }: { onBack: () => void }) {
               const result = await ImagePicker.launchCameraAsync({
                 allowsEditing: true,
                 aspect: [1, 1],
-                quality: 0.8,
+                quality: 0.5,
+                base64: true,
               });
               if (!result.canceled && result.assets && result.assets.length > 0) {
-                updateActiveChild({ avatarUri: result.assets[0].uri });
+                const asset = result.assets[0];
+                const persistentUri = asset.base64
+                  ? `data:image/jpeg;base64,${asset.base64}`
+                  : asset.uri;
+                setAvatarUri(persistentUri);
+                updateActiveChild({ avatarUri: persistentUri });
               }
             } catch (err) {
               console.warn('Camera picker error:', err);
@@ -64,22 +71,31 @@ export function ChildProfileScreen({ onBack }: { onBack: () => void }) {
                 mediaTypes: ['images'],
                 allowsEditing: true,
                 aspect: [1, 1],
-                quality: 0.8,
+                quality: 0.5,
+                base64: true,
               });
               if (!result.canceled && result.assets && result.assets.length > 0) {
-                updateActiveChild({ avatarUri: result.assets[0].uri });
+                const asset = result.assets[0];
+                const persistentUri = asset.base64
+                  ? `data:image/jpeg;base64,${asset.base64}`
+                  : asset.uri;
+                setAvatarUri(persistentUri);
+                updateActiveChild({ avatarUri: persistentUri });
               }
             } catch (err) {
               console.warn('Library picker error:', err);
             }
           },
         },
-        ...(activeChild.avatarUri
+        ...(avatarUri || activeChild.avatarUri
           ? [
               {
                 text: 'Remove Photo',
                 style: 'destructive' as const,
-                onPress: () => updateActiveChild({ avatarUri: undefined }),
+                onPress: () => {
+                  setAvatarUri(undefined);
+                  updateActiveChild({ avatarUri: undefined });
+                },
               },
             ]
           : []),
@@ -96,7 +112,8 @@ export function ChildProfileScreen({ onBack }: { onBack: () => void }) {
     setName(activeChild.name);
     setDob(activeChild.birthDate);
     setPediatrician(activeChild.linkedPediatrician);
-  }, [activeChild.id]);
+    setAvatarUri(activeChild.avatarUri);
+  }, [activeChild.id, activeChild.avatarUri]);
 
   const handleSave = () => {
     const finalName = name.trim() || activeChild.name;
@@ -107,6 +124,7 @@ export function ChildProfileScreen({ onBack }: { onBack: () => void }) {
       name: finalName,
       birthDate: finalDob,
       linkedPediatrician: finalPediatrician,
+      avatarUri: avatarUri,
     });
 
     try {
@@ -124,7 +142,8 @@ export function ChildProfileScreen({ onBack }: { onBack: () => void }) {
     const isDirty =
       name.trim() !== activeChild.name ||
       dob.trim() !== activeChild.birthDate ||
-      pediatrician.trim() !== activeChild.linkedPediatrician;
+      pediatrician.trim() !== activeChild.linkedPediatrician ||
+      avatarUri !== activeChild.avatarUri;
 
     if (isDirty) {
       Alert.alert(
@@ -265,8 +284,8 @@ export function ChildProfileScreen({ onBack }: { onBack: () => void }) {
             activeOpacity={0.8}
           >
             <View style={styles.avatarCircle}>
-              {activeChild.avatarUri ? (
-                <Image source={{ uri: activeChild.avatarUri }} style={styles.avatarImage} />
+              {(avatarUri || activeChild.avatarUri) ? (
+                <Image source={{ uri: avatarUri || activeChild.avatarUri }} style={styles.avatarImage} />
               ) : (
                 <User size={36} color="#0d9488" />
               )}

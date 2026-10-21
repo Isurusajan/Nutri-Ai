@@ -1,3 +1,4 @@
+import React, { useMemo } from 'react';
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -25,6 +26,7 @@ export interface ScanHistoryItem {
   score: number;
   color: string;
   flag: string;
+  imageUri?: string;
   fullAssessment: ScanAssessmentResponse;
 }
 
@@ -48,7 +50,9 @@ interface AppState {
   removeCondition: (condition: string) => void;
 
   // History Actions
-  addScanRecord: (assessment: ScanAssessmentResponse) => void;
+  addScanRecord: (assessment: ScanAssessmentResponse, imageUri?: string) => void;
+  removeScanRecord: (id: string) => void;
+  clearHistory: () => void;
   getHistoryForActiveChild: () => ScanHistoryItem[];
   get7DayExposureIndex: () => number;
   resetToDemoData: () => void;
@@ -80,89 +84,214 @@ const INITIAL_CHILDREN: ChildProfile[] = [
 
 const INITIAL_HISTORY: ScanHistoryItem[] = [
   {
-    id: '1',
+    id: 'SL-01',
     childId: 'CHD-9021',
-    productName: 'Fizzy Orange Nectar (250ml)',
-    date: 'Today, 16:45',
+    productName: 'Munchee Super Cream Cracker',
+    date: 'Today, 18:15',
     timestamp: new Date().toISOString(),
-    category: 'High Concern',
-    score: 84,
-    color: '#f43f5e',
-    flag: 'E211 + E110 Synergistic Interaction',
+    category: 'Low Concern',
+    score: 14,
+    color: '#10b981',
+    flag: 'Safe traditional leavening (E500, E503) • Zero synthetic dyes',
+    imageUri: 'https://cdn.shopify.com/s/files/1/0703/5574/6981/files/3000293-01.jpg?v=1748382637',
     fullAssessment: {
-      scan_id: 'SCN-HST-8411',
-      product_name: 'Fizzy Orange Nectar (250ml)',
+      scan_id: 'SCN-LK-0101',
+      product_name: 'Munchee Super Cream Cracker',
       input_type: 'label_ocr',
       detected_additives: [
-        { code: 'E110', name: 'Sunset Yellow FCF', category: 'Artificial Colorant (Azo Dye)', matched_sensitivities: ['hyperactivity_interaction', 'asthma_sensitivity'] },
-        { code: 'E211', name: 'Sodium Benzoate', category: 'Preservative', matched_sensitivities: ['hyperactivity_interaction', 'asthma_sensitivity'] },
-        { code: 'E330', name: 'Citric Acid', category: 'Acidity Regulator', matched_sensitivities: [] },
+        { code: 'E500', name: 'Sodium Bicarbonate', category: 'Raising Agent', matched_sensitivities: [] },
+        { code: 'E503', name: 'Ammonium Bicarbonate', category: 'Raising Agent', matched_sensitivities: [] },
+        { code: 'E322', name: 'Plant Soya Lecithin', category: 'Emulsifier', matched_sensitivities: [] },
       ],
-      interaction_detected: true,
-      interaction_evidence_source: 'McCann et al., Lancet 2007 (doi: 10.1016/S0140-6736(07)61306-3)',
-      risk_score: 84.0,
-      risk_category: 'High Concern',
+      interaction_detected: false,
+      risk_score: 14.0,
+      risk_category: 'Low Concern',
       contributing_factors: [
-        { factor_name: 'Synergistic Additive Interaction (E211 + E110)', impact_direction: 'increases_risk', relative_weight: 36.5, plain_text_explanation: 'Detected combination E211 + E110 contributes +36.5% to the risk score.' },
-        { factor_name: 'Inherent Chemical Additive Load', impact_direction: 'increases_risk', relative_weight: 28.6, plain_text_explanation: 'Regulatory hazard weights account for +28.6% of the score.' },
-        { factor_name: 'Child Condition & Sensitivity Relevance', impact_direction: 'increases_risk', relative_weight: 26.1, plain_text_explanation: 'Correlates with child vulnerabilities (Asthma, ADHD), accounting for +26.1%.' },
+        { factor_name: 'Standard Leavening Agents', impact_direction: 'decreases_risk', relative_weight: 14.0, plain_text_explanation: 'Baking soda (E500) and ammonium carbonates (E503) are safe standard bakery salts.' }
       ],
-      disclaimer: 'Screening result for decision support only. Does not measure biological toxicity or replace medical diagnosis.',
+      disclaimer: 'Screening result for decision support only.',
       timestamp: new Date().toISOString(),
     },
   },
   {
-    id: '2',
+    id: 'SL-02',
     childId: 'CHD-9021',
-    productName: 'Savory Cheese Flavored Rings',
-    date: 'Yesterday, 11:20',
-    timestamp: new Date(Date.now() - 86400000).toISOString(),
-    category: 'Moderate Concern',
-    score: 62,
-    color: '#f59e0b',
-    flag: 'Tartrazine (E102) Allergy Match',
+    productName: 'Kottu Mee Hot & Spicy (80g)',
+    date: 'Today, 14:20',
+    timestamp: new Date(Date.now() - 3600000 * 4).toISOString(),
+    category: 'High Concern',
+    score: 89,
+    color: '#f43f5e',
+    flag: 'E621 (MSG) + E102 (Tartrazine) + E627/E631 Synergistic Load',
+    imageUri: 'https://primakottumee.com/wp-content/uploads/2023/07/prima-kottumee-hot-spicy.png',
     fullAssessment: {
-      scan_id: 'SCN-HST-8412',
-      product_name: 'Savory Cheese Flavored Rings',
+      scan_id: 'SCN-LK-0102',
+      product_name: 'Kottu Mee Hot & Spicy (80g)',
+      input_type: 'label_ocr',
+      detected_additives: [
+        { code: 'E102', name: 'Tartrazine', category: 'Artificial Colorant (Azo Dye)', matched_sensitivities: ['asthma_sensitivity', 'allergy_match'] },
+        { code: 'E621', name: 'Monosodium Glutamate', category: 'Flavour Enhancer', matched_sensitivities: ['asthma_sensitivity'] },
+        { code: 'E627', name: 'Disodium Guanylate', category: 'Flavour Enhancer', matched_sensitivities: [] },
+        { code: 'E631', name: 'Disodium Inosinate', category: 'Flavour Enhancer', matched_sensitivities: [] },
+        { code: 'E150d', name: 'Caramel IV (Sulfite Ammonia)', category: 'Colorant', matched_sensitivities: [] },
+      ],
+      interaction_detected: true,
+      interaction_evidence_source: 'McCann et al., Lancet 2007 (doi: 10.1016/S0140-6736(07)61306-3) & EFSA MSG Exposure Benchmark',
+      risk_score: 89.0,
+      risk_category: 'High Concern',
+      contributing_factors: [
+        { factor_name: 'Direct Child Allergy Match (E102 Tartrazine)', impact_direction: 'increases_risk', relative_weight: 44.0, plain_text_explanation: 'Tartrazine matches active allergy profile for Senudi.' },
+        { factor_name: 'MSG + Nucleotide Flavor Synergy (E621 + E627 + E631)', impact_direction: 'increases_risk', relative_weight: 31.0, plain_text_explanation: 'High cumulative glutamate load exacerbates pediatric asthma and bronchospasm risks.' },
+        { factor_name: 'Artificial Azo Dye Exposure', impact_direction: 'increases_risk', relative_weight: 14.0, plain_text_explanation: 'Southampton azo dye linked to pediatric hyper-reactivity.' }
+      ],
+      disclaimer: 'Screening result for decision support only. Does not measure biological toxicity or replace medical diagnosis.',
+      timestamp: new Date(Date.now() - 3600000 * 4).toISOString(),
+    },
+  },
+  {
+    id: 'SL-03',
+    childId: 'CHD-9021',
+    productName: 'Munchee Lemon Puff (100g)',
+    date: 'Yesterday, 16:10',
+    timestamp: new Date(Date.now() - 86400000).toISOString(),
+    category: 'High Concern',
+    score: 76,
+    color: '#f43f5e',
+    flag: 'Direct Child Allergy Match: Tartrazine (E102)',
+    imageUri: 'https://cdn.shopify.com/s/files/1/0703/5574/6981/files/3014367-2_1.jpg?v=1748383252',
+    fullAssessment: {
+      scan_id: 'SCN-LK-0103',
+      product_name: 'Munchee Lemon Puff (100g)',
       input_type: 'barcode_lookup',
       detected_additives: [
         { code: 'E102', name: 'Tartrazine', category: 'Artificial Colorant (Azo Dye)', matched_sensitivities: ['asthma_sensitivity', 'allergy_match'] },
-        { code: 'E621', name: 'Monosodium Glutamate', category: 'Flavour Enhancer', matched_sensitivities: [] },
+        { code: 'E330', name: 'Citric Acid', category: 'Acidity Regulator', matched_sensitivities: [] },
+        { code: 'E500', name: 'Sodium Carbonates', category: 'Raising Agent', matched_sensitivities: [] },
+        { code: 'E322', name: 'Plant Lecithin', category: 'Emulsifier', matched_sensitivities: [] },
       ],
       interaction_detected: false,
-      risk_score: 62.0,
-      risk_category: 'Moderate Concern',
+      risk_score: 76.0,
+      risk_category: 'High Concern',
       contributing_factors: [
-        { factor_name: 'Direct Child Allergy Match (E102)', impact_direction: 'increases_risk', relative_weight: 48.0, plain_text_explanation: 'Tartrazine matches active allergy profile for child.' },
+        { factor_name: 'Direct Child Allergy Match (E102 Tartrazine)', impact_direction: 'increases_risk', relative_weight: 56.0, plain_text_explanation: 'Yellow azo dye Tartrazine matches Senudi\'s known allergy profile.' }
       ],
       disclaimer: 'Screening result for decision support only.',
       timestamp: new Date(Date.now() - 86400000).toISOString(),
     },
   },
   {
-    id: '3',
+    id: 'SL-04',
     childId: 'CHD-9021',
-    productName: 'Organic Strawberry Yogurt',
-    date: '08 Oct, 08:30',
-    timestamp: new Date(Date.now() - 259200000).toISOString(),
-    category: 'Low Concern',
-    score: 18,
-    color: '#10b981',
-    flag: 'Safe natural extracts (E162, E440)',
+    productName: 'Munchee Chocolate Biscuit',
+    date: 'Yesterday, 11:30',
+    timestamp: new Date(Date.now() - 92000000).toISOString(),
+    category: 'Moderate Concern',
+    score: 38,
+    color: '#f59e0b',
+    flag: 'Cocoa powder • Emulsifier (E322, E471) • Raising agent (E500)',
+    imageUri: 'https://cdn.shopify.com/s/files/1/0703/5574/6981/files/3000075-1.jpg?v=1748382602',
     fullAssessment: {
-      scan_id: 'SCN-HST-8413',
-      product_name: 'Organic Strawberry Yogurt',
+      scan_id: 'SCN-LK-0104',
+      product_name: 'Munchee Chocolate Biscuit',
       input_type: 'label_ocr',
       detected_additives: [
-        { code: 'E162', name: 'Beetroot Red', category: 'Natural Colorant', matched_sensitivities: [] },
-        { code: 'E440', name: 'Pectins', category: 'Gelling Agent', matched_sensitivities: [] },
+        { code: 'E322', name: 'Soy Lecithin', category: 'Emulsifier', matched_sensitivities: [] },
+        { code: 'E471', name: 'Mono- and Diglycerides of Fatty Acids', category: 'Emulsifier', matched_sensitivities: [] },
+        { code: 'E500', name: 'Sodium Bicarbonate', category: 'Raising Agent', matched_sensitivities: [] },
       ],
       interaction_detected: false,
-      risk_score: 18.0,
+      risk_score: 38.0,
+      risk_category: 'Moderate Concern',
+      contributing_factors: [
+        { factor_name: 'Standard Bakery Additive Load', impact_direction: 'increases_risk', relative_weight: 24.0, plain_text_explanation: 'Cocoa solids and food-grade bakery emulsifiers; safe under standard daily intake.' }
+      ],
+      disclaimer: 'Screening result for decision support only.',
+      timestamp: new Date(Date.now() - 92000000).toISOString(),
+    },
+  },
+  {
+    id: 'SL-05',
+    childId: 'CHD-9021',
+    productName: 'Anchor Full Cream Milk Powder',
+    date: '20 Oct, 08:30',
+    timestamp: new Date(Date.now() - 172800000).toISOString(),
+    category: 'Low Concern',
+    score: 8,
+    color: '#10b981',
+    flag: '100% Pure Dairy • Natural Soy Lecithin (E322) • Fortified',
+    imageUri: 'https://cdn.shopify.com/s/files/1/0703/5574/6981/files/Anchor-Full-Cream-Carton-400g-Relaunch-Stage-01-_FOP_-_CMYK_-DSK__Croped.png?v=1756959499',
+    fullAssessment: {
+      scan_id: 'SCN-LK-0105',
+      product_name: 'Anchor Full Cream Milk Powder',
+      input_type: 'barcode_lookup',
+      detected_additives: [
+        { code: 'E322', name: 'Soy Lecithin', category: 'Natural Emulsifier', matched_sensitivities: [] },
+      ],
+      interaction_detected: false,
+      risk_score: 8.0,
       risk_category: 'Low Concern',
       contributing_factors: [],
       disclaimer: 'Screening result for decision support only.',
+      timestamp: new Date(Date.now() - 172800000).toISOString(),
+    },
+  },
+  {
+    id: 'SL-06',
+    childId: 'CHD-9021',
+    productName: 'Elephant House Cream Soda (400ml)',
+    date: '19 Oct, 17:00',
+    timestamp: new Date(Date.now() - 259200000).toISOString(),
+    category: 'High Concern',
+    score: 82,
+    color: '#f43f5e',
+    flag: 'Tartrazine (E102) Allergy Match + Sodium Benzoate (E211)',
+    imageUri: 'https://cdn.shopify.com/s/files/1/0703/5574/6981/files/3002486-1.jpg?v=1748382798',
+    fullAssessment: {
+      scan_id: 'SCN-LK-0106',
+      product_name: 'Elephant House Cream Soda (400ml)',
+      input_type: 'label_ocr',
+      detected_additives: [
+        { code: 'E102', name: 'Tartrazine', category: 'Artificial Colorant (Azo Dye)', matched_sensitivities: ['allergy_match', 'asthma_sensitivity'] },
+        { code: 'E211', name: 'Sodium Benzoate', category: 'Preservative', matched_sensitivities: ['asthma_sensitivity'] },
+        { code: 'E330', name: 'Citric Acid', category: 'Acidity Regulator', matched_sensitivities: [] },
+      ],
+      interaction_detected: true,
+      interaction_evidence_source: 'Southampton Randomized Trial (Lancet 2007) & SLSI Guidelines',
+      risk_score: 82.0,
+      risk_category: 'High Concern',
+      contributing_factors: [
+        { factor_name: 'Child Allergy Match (E102)', impact_direction: 'increases_risk', relative_weight: 48.0, plain_text_explanation: 'Direct sensitivity match for Senudi.' }
+      ],
+      disclaimer: 'Screening result for decision support only.',
       timestamp: new Date(Date.now() - 259200000).toISOString(),
+    },
+  },
+  {
+    id: 'SL-07',
+    childId: 'CHD-9021',
+    productName: 'Maliban Gold Marie',
+    date: '18 Oct, 09:15',
+    timestamp: new Date(Date.now() - 345600000).toISOString(),
+    category: 'Low Concern',
+    score: 16,
+    color: '#10b981',
+    flag: 'Wheat flour, milk solids, raising agents (E500, E503) • Safe',
+    imageUri: 'https://cdn.shopify.com/s/files/1/0703/5574/6981/files/3000957-1.jpg?v=1748382693',
+    fullAssessment: {
+      scan_id: 'SCN-LK-0107',
+      product_name: 'Maliban Gold Marie',
+      input_type: 'label_ocr',
+      detected_additives: [
+        { code: 'E500', name: 'Sodium Bicarbonate', category: 'Raising Agent', matched_sensitivities: [] },
+        { code: 'E503', name: 'Ammonium Bicarbonate', category: 'Raising Agent', matched_sensitivities: [] },
+        { code: 'E322', name: 'Lecithin', category: 'Emulsifier', matched_sensitivities: [] },
+      ],
+      interaction_detected: false,
+      risk_score: 16.0,
+      risk_category: 'Low Concern',
+      contributing_factors: [],
+      disclaimer: 'Screening result for decision support only.',
+      timestamp: new Date(Date.now() - 345600000).toISOString(),
     },
   },
 ];
@@ -277,7 +406,7 @@ export const useAppStore = create<AppState>()(
     }));
   },
 
-  addScanRecord: (assessment: ScanAssessmentResponse) => {
+  addScanRecord: (assessment: ScanAssessmentResponse, imageUri?: string) => {
     const activeChild = get().getActiveChild();
     const isHigh = assessment.risk_category === 'High Concern';
     const isMod = assessment.risk_category === 'Moderate Concern';
@@ -292,6 +421,11 @@ export const useAppStore = create<AppState>()(
       flag = 'Potential Sensitivity Match';
     }
 
+    const resolvedImage =
+      imageUri ||
+      (assessment as any).product_image_url ||
+      getFoodItemImageUri(assessment.product_name || '');
+
     const newItem: ScanHistoryItem = {
       id: assessment.scan_id || `SCN-${Date.now()}`,
       childId: activeChild.id,
@@ -302,12 +436,23 @@ export const useAppStore = create<AppState>()(
       score: Math.round(assessment.risk_score),
       color,
       flag,
+      imageUri: resolvedImage,
       fullAssessment: assessment,
     };
 
     set((state) => ({
       history: [newItem, ...state.history],
     }));
+  },
+
+  removeScanRecord: (id: string) => {
+    set((state) => ({
+      history: state.history.filter((h) => h.id !== id),
+    }));
+  },
+
+  clearHistory: () => {
+    set({ history: [] });
   },
 
   getHistoryForActiveChild: () => {
@@ -337,7 +482,7 @@ export const useAppStore = create<AppState>()(
   },
 }),
   {
-    name: 'nutrisafe_app_storage_v1',
+    name: 'nutrisafe_app_storage_v4',
     storage: createJSONStorage(() => AsyncStorage),
     partialize: (state) => ({
       activeChildId: state.activeChildId,
@@ -346,3 +491,73 @@ export const useAppStore = create<AppState>()(
     }),
   }
 ));
+
+/**
+ * React Hooks providing memoized selectors to prevent infinite re-render loops (REQ / React 18+ snapshot cache)
+ */
+export function useActiveChild(): ChildProfile {
+  const children = useAppStore((state) => state.children);
+  const activeChildId = useAppStore((state) => state.activeChildId);
+  return useMemo(() => {
+    return (
+      children.find((c) => c.id === activeChildId) ||
+      children[0] ||
+      INITIAL_CHILDREN[0]
+    );
+  }, [children, activeChildId]);
+}
+
+export function useActiveChildHistory(): ScanHistoryItem[] {
+  const history = useAppStore((state) => state.history);
+  const activeChildId = useAppStore((state) => state.activeChildId);
+  return useMemo(() => {
+    return history.filter((h) => h.childId === activeChildId);
+  }, [history, activeChildId]);
+}
+
+export function use7DayExposureIndex(): number {
+  const activeHistory = useActiveChildHistory();
+  return useMemo(() => {
+    if (activeHistory.length === 0) return 15;
+
+    const totalScore = activeHistory.reduce((acc, item) => acc + item.score, 0);
+    const avgScore = totalScore / activeHistory.length;
+    const countLoad = Math.min(activeHistory.length * 4, 30);
+    const index = Math.min(Math.round(avgScore * 0.7 + countLoad), 100);
+    return Math.max(index, 10);
+  }, [activeHistory]);
+}
+
+/**
+ * Returns authentic Sri Lankan food packaging photo or resolved imageUri for a given item
+ */
+export function getFoodItemImageUri(productName: string, imageUri?: string): string {
+  // If an imageUri is already provided and not an old generic unsplash placeholder, keep it
+  if (imageUri && imageUri.trim() && !imageUri.includes('images.unsplash.com')) {
+    return imageUri;
+  }
+  const name = productName.toLowerCase();
+  if (name.includes('kottu') || name.includes('mee') || name.includes('noodle') || name.includes('prima')) {
+    return 'https://primakottumee.com/wp-content/uploads/2023/07/prima-kottumee-hot-spicy.png';
+  }
+  if (name.includes('lemon puff') || name.includes('lemon')) {
+    return 'https://cdn.shopify.com/s/files/1/0703/5574/6981/files/3014367-2_1.jpg?v=1748383252';
+  }
+  if (name.includes('cream cracker') || name.includes('cracker')) {
+    return 'https://cdn.shopify.com/s/files/1/0703/5574/6981/files/3000293-01.jpg?v=1748382637';
+  }
+  if (name.includes('marie') || name.includes('gold marie')) {
+    return 'https://cdn.shopify.com/s/files/1/0703/5574/6981/files/3000957-1.jpg?v=1748382693';
+  }
+  if (name.includes('chocolate') || name.includes('chocklate') || name.includes('biscuit') || name.includes('puff')) {
+    return 'https://cdn.shopify.com/s/files/1/0703/5574/6981/files/3000075-1.jpg?v=1748382602';
+  }
+  if (name.includes('anchor') || name.includes('kiri') || name.includes('milk') || name.includes('piti')) {
+    return 'https://cdn.shopify.com/s/files/1/0703/5574/6981/files/Anchor-Full-Cream-Carton-400g-Relaunch-Stage-01-_FOP_-_CMYK_-DSK__Croped.png?v=1756959499';
+  }
+  if (name.includes('cream soda') || name.includes('soda') || name.includes('fizzy') || name.includes('drink') || name.includes('beverage') || name.includes('elephant')) {
+    return 'https://cdn.shopify.com/s/files/1/0703/5574/6981/files/3002486-1.jpg?v=1748382798';
+  }
+  // Default to CBL Super Cream Cracker pack
+  return 'https://cdn.shopify.com/s/files/1/0703/5574/6981/files/3000293-01.jpg?v=1748382637';
+}
