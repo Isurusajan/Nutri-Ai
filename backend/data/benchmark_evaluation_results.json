@@ -1,0 +1,31 @@
+{
+  "rule_baseline": {
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "accuracy": 0.9684,
+    "auc": 0.0,
+    "tp": 0,
+    "fp": 0,
+    "fn": 3,
+    "tn": 92
+  },
+  "rgcn_model": {
+    "precision": 0.0312,
+    "recall": 0.3333,
+    "f1": 0.0571,
+    "accuracy": 0.6526,
+    "auc": 0.5181,
+    "tp": 1,
+    "fp": 31,
+    "fn": 2,
+    "tn": 61
+  },
+  "sample_counts": {
+    "total_additives": 28,
+    "total_pairs": 378,
+    "evidence_pairs": 18,
+    "test_positives": 3,
+    "test_negatives": 92
+  }
+}

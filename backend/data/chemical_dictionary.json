@@ -250,5 +250,14 @@
     "common_uses": ["Margarine", "cheese", "juices", "baked goods"],
     "hazard_weight": 0.05,
     "pediatric_concern_tags": ["provitamin_a", "safe"]
+  },
+  {
+    "code": "E322",
+    "name": "Lecithins",
+    "category": "Emulsifier",
+    "synonyms": ["lecithins", "lecithin", "soy lecithin", "sunflower lecithin", "e322", "ins 322", "e-322"],
+    "common_uses": ["Chocolate", "baked goods", "margarine", "instant powders"],
+    "hazard_weight": 0.15,
+    "pediatric_concern_tags": ["soy_allergen_caution", "generally_recognized_safe"]
   }
 ]

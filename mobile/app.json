@@ -12,11 +12,14 @@
     },
     "ios": {
       "supportsTablet": true,
+      "bundleIdentifier": "lk.ac.mrt.itum.bit.nutrisafe",
       "infoPlist": {
         "NSCameraUsageDescription": "NutriSafe AI uses your camera to scan food ingredient labels and product barcodes for personalized pediatric additive risk assessment."
       }
     },
     "android": {
+      "package": "lk.ac.mrt.itum.bit.nutrisafe",
+      "versionCode": 1,
       "adaptiveIcon": {
         "backgroundColor": "#0d9488",
         "foregroundImage": "./assets/android-icon-foreground.png",

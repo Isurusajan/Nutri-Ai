@@ -6,38 +6,58 @@ import { ChildProfileScreen } from './src/screens/ChildProfileScreen';
 import { HistoryScreen } from './src/screens/HistoryScreen';
 import { InfoScreen } from './src/screens/InfoScreen';
 import { Camera, Clock, User, Info } from 'lucide-react-native';
+import { ScanAssessmentResponse } from './src/api/client';
+import { AppIntroSplash } from './src/components/AppIntroSplash';
 
 export default function App() {
+  const [showSplash, setShowSplash] = useState(true);
   const [activeTab, setActiveTab] = useState<'scan' | 'history' | 'profile' | 'info'>('scan');
-  const [viewingResult, setViewingResult] = useState(false);
+  const [currentResult, setCurrentResult] = useState<{ result: ScanAssessmentResponse; imageUri?: string } | null>(null);
+
+  const handleOpenResult = (res: ScanAssessmentResponse, imageUri?: string) => {
+    setCurrentResult({ result: res, imageUri });
+  };
+
+  if (showSplash) {
+    return <AppIntroSplash onFinish={() => setShowSplash(false)} />;
+  }
 
   return (
     <View style={styles.container}>
       {/* Active Screen Content */}
       <View style={styles.content}>
-        {viewingResult ? (
-          <ScanResultScreen onBack={() => setViewingResult(false)} />
+        {currentResult ? (
+          <ScanResultScreen
+            result={currentResult.result}
+            imageUri={currentResult.imageUri}
+            onBack={() => setCurrentResult(null)}
+          />
         ) : (
           <>
             {activeTab === 'scan' && (
               <HomeScreen
-                onNavigateToResult={() => setViewingResult(true)}
+                onNavigateToResult={handleOpenResult}
                 onNavigateToProfile={() => setActiveTab('profile')}
+                onReplayIntro={() => setShowSplash(true)}
               />
             )}
             {activeTab === 'history' && (
-              <HistoryScreen onSelectScan={() => setViewingResult(true)} />
+              <HistoryScreen
+                onSelectScan={(assessment) => handleOpenResult(assessment)}
+              />
             )}
             {activeTab === 'profile' && (
               <ChildProfileScreen onBack={() => setActiveTab('scan')} />
             )}
-            {activeTab === 'info' && <InfoScreen />}
+            {activeTab === 'info' && (
+              <InfoScreen onReplayIntro={() => setShowSplash(true)} />
+            )}
           </>
         )}
       </View>
 
-      {/* Bottom Navigation Bar (SRS Section 3.1) */}
-      {!viewingResult && (
+      {/* Bottom Navigation Bar */}
+      {!currentResult && (
         <SafeAreaView style={styles.navBarContainer}>
           <View style={styles.navBar}>
             <TouchableOpacity

@@ -1,6 +1,7 @@
 import React, { useState } from "react"
 import { PediatricianPortal } from "./pages/PediatricianPortal"
 import { RegulatoryDashboard } from "./pages/RegulatoryDashboard"
+import { AcademicEvaluation } from "./pages/AcademicEvaluation"
 import { Button } from "./components/ui/button"
 import { Badge } from "./components/ui/badge"
 import {
@@ -12,10 +13,11 @@ import {
   ShieldCheck,
   Smartphone,
   ExternalLink,
+  GraduationCap,
 } from "lucide-react"
 
 export function App() {
-  const [activeTab, setActiveTab] = useState<"pediatrician" | "regulatory">("pediatrician")
+  const [activeTab, setActiveTab] = useState<"pediatrician" | "regulatory" | "evaluation">("pediatrician")
 
   return (
     <div className="min-h-screen bg-slate-50/60 dark:bg-slate-950 text-foreground flex flex-col">
@@ -93,6 +95,21 @@ export function App() {
                 De-identified
               </Badge>
             </button>
+
+            <button
+              onClick={() => setActiveTab("evaluation")}
+              className={`flex items-center gap-2 py-3 px-4 text-xs font-semibold border-b-2 transition-colors ${
+                activeTab === "evaluation"
+                  ? "border-indigo-600 text-indigo-700 dark:text-indigo-400 bg-indigo-50/50 dark:bg-indigo-950/20"
+                  : "border-transparent text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <GraduationCap className="h-4 w-4" />
+              Academic Evaluation & Viva
+              <Badge variant="secondary" className="text-[10px] h-4 px-1.5 bg-indigo-100 text-indigo-800">
+                Chapter 5
+              </Badge>
+            </button>
           </div>
         </div>
       </header>
@@ -101,6 +118,7 @@ export function App() {
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {activeTab === "pediatrician" && <PediatricianPortal />}
         {activeTab === "regulatory" && <RegulatoryDashboard />}
+        {activeTab === "evaluation" && <AcademicEvaluation />}
       </main>
 
       {/* Footer with Academic Note */}

@@ -1,55 +1,23 @@
 import React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView, SafeAreaView, StatusBar } from 'react-native';
-import { Clock, ShieldAlert, CheckCircle, AlertTriangle, ChevronRight, TrendingUp, Calendar } from 'lucide-react-native';
-
-const mockHistory = [
-  {
-    id: '1',
-    product: 'Fizzy Orange Nectar (250ml)',
-    date: 'Today, 16:45',
-    category: 'High Concern',
-    score: 84,
-    color: '#f43f5e',
-    flag: 'E211 + E110 Synergistic Interaction',
-  },
-  {
-    id: '2',
-    product: 'Savory Cheese Flavored Rings',
-    date: 'Yesterday, 11:20',
-    category: 'Moderate Concern',
-    score: 62,
-    color: '#f59e0b',
-    flag: 'Tartrazine (E102) Allergy Match',
-  },
-  {
-    id: '3',
-    product: 'Organic Whole Milk Strawberry Yogurt',
-    date: '08 Oct, 08:30',
-    category: 'Low Concern',
-    score: 18,
-    color: '#10b981',
-    flag: 'Safe natural extracts (E162, E440)',
-  },
-  {
-    id: '4',
-    product: 'Artificially Colored Chewy Candies',
-    date: '06 Oct, 14:15',
-    category: 'High Concern',
-    score: 88,
-    color: '#f43f5e',
-    flag: 'Allura Red (E129) + Tartrazine (E102)',
-  },
-];
+import { Clock, ShieldAlert, CheckCircle, AlertTriangle, ChevronRight, TrendingUp, Calendar, Sparkles } from 'lucide-react-native';
+import { NutriSafeBrandHeader } from '../components/NutriSafeBrandHeader';
+import { useAppStore } from '../store/useAppStore';
 
 export function HistoryScreen({ onSelectScan }: { onSelectScan: (item: any) => void }) {
+  const activeChild = useAppStore((state) => state.getActiveChild());
+  const history = useAppStore((state) => state.getHistoryForActiveChild());
+  const exposureIndex = useAppStore((state) => state.get7DayExposureIndex());
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
+      <NutriSafeBrandHeader subtitle="Dietary Exposure Journal" />
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Title */}
         <View style={styles.header}>
           <Text style={styles.title}>Scan History</Text>
-          <Text style={styles.subtitle}>Recorded food products for Senudi Perera</Text>
+          <Text style={styles.subtitle}>Recorded food products for {activeChild.name}</Text>
         </View>
 
         {/* 7-Day Exposure Trend Card (SRS Section 4.5 / REQ-5.3) */}
@@ -59,43 +27,65 @@ export function HistoryScreen({ onSelectScan }: { onSelectScan: (item: any) => v
             <Text style={styles.exposureTitle}>7-Day Estimated Dietary Exposure</Text>
           </View>
           <Text style={styles.exposureScoreText}>
-            Index: <Text style={styles.boldScore}>48 / 100</Text>
+            Index: <Text style={styles.boldScore}>{exposureIndex} / 100</Text>
           </Text>
           <Text style={styles.exposureDesc}>
-            Derived from 4 logged items this week. Moderate exposure index; below conservative safety threshold (50).
+            Derived from {history.length} logged items this week for {activeChild.name}.{' '}
+            {exposureIndex >= 60
+              ? 'Elevated exposure index; consider low-additive alternatives.'
+              : 'Within safe cumulative exposure threshold (< 50).'}
           </Text>
           <View style={styles.barVisualWrap}>
-            <View style={[styles.barFill, { width: '48%', backgroundColor: '#0d9488' }]} />
+            <View
+              style={[
+                styles.barFill,
+                {
+                  width: `${Math.min(exposureIndex, 100)}%`,
+                  backgroundColor: exposureIndex >= 60 ? '#f43f5e' : '#0d9488',
+                },
+              ]}
+            />
           </View>
         </View>
 
         {/* List of Recent Scans */}
-        <Text style={styles.listHeading}>Logged Products</Text>
-        {mockHistory.map((item) => (
-          <TouchableOpacity
-            key={item.id}
-            style={styles.card}
-            onPress={() => onSelectScan(item)}
-          >
-            <View style={[styles.badgeStrip, { backgroundColor: item.color }]} />
-            <View style={styles.cardContent}>
-              <View style={styles.rowTop}>
-                <Text style={styles.productName}>{item.product}</Text>
-                <Text style={[styles.scoreBadge, { color: item.color }]}>{item.score}/100</Text>
-              </View>
+        <Text style={styles.listHeading}>Logged Products ({history.length})</Text>
 
-              <Text style={styles.dateText}>{item.date}</Text>
+        {history.length === 0 ? (
+          <View style={styles.emptyCard}>
+            <Sparkles size={28} color="#94a3b8" />
+            <Text style={styles.emptyTitle}>No Scans Logged Yet</Text>
+            <Text style={styles.emptySub}>
+              Scan an ingredient label with your camera to evaluate risk factors and log dietary history.
+            </Text>
+          </View>
+        ) : (
+          history.map((item) => (
+            <TouchableOpacity
+              key={item.id}
+              style={styles.card}
+              onPress={() => onSelectScan(item.fullAssessment)}
+            >
+              <View style={[styles.badgeStrip, { backgroundColor: item.color }]} />
+              <View style={styles.cardContent}>
+                <View style={styles.rowTop}>
+                  <Text style={styles.productName} numberOfLines={1}>{item.productName}</Text>
+                  <Text style={[styles.scoreBadge, { color: item.color }]}>{item.score}/100</Text>
+                </View>
 
-              <View style={styles.rowBottom}>
-                <Text style={[styles.categoryText, { color: item.color }]}>
-                  {item.category}
-                </Text>
-                <Text style={styles.flagText} numberOfLines={1}>• {item.flag}</Text>
+                <Text style={styles.dateText}>{item.date}</Text>
+
+                <View style={styles.rowBottom}>
+                  <Text style={[styles.categoryText, { color: item.color }]}>
+                    {item.category}
+                  </Text>
+                  <Text style={styles.flagText} numberOfLines={1}>• {item.flag}</Text>
+                </View>
               </View>
-            </View>
-            <ChevronRight size={18} color="#94a3b8" />
-          </TouchableOpacity>
-        ))}
+              <ChevronRight size={18} color="#94a3b8" />
+            </TouchableOpacity>
+          ))
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -103,8 +93,8 @@ export function HistoryScreen({ onSelectScan }: { onSelectScan: (item: any) => v
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f8fafc' },
-  scrollContent: { padding: 20 },
-  header: { marginBottom: 20 },
+  scrollContent: { padding: 18, paddingTop: 14 },
+  header: { marginBottom: 16 },
   title: { fontSize: 22, fontWeight: '800', color: '#0f172a' },
   subtitle: { fontSize: 13, color: '#64748b', marginTop: 2 },
   exposureCard: { backgroundColor: '#ffffff', borderRadius: 16, padding: 18, borderWidth: 1, borderColor: '#e2e8f0', marginBottom: 22, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.04, shadowRadius: 6, elevation: 1 },
@@ -126,4 +116,16 @@ const styles = StyleSheet.create({
   rowBottom: { flexDirection: 'row', alignItems: 'center', marginTop: 6, gap: 4 },
   categoryText: { fontSize: 11, fontWeight: '700' },
   flagText: { fontSize: 11, color: '#64748b', flex: 1 },
+  emptyCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: 28,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    gap: 8,
+    marginTop: 10,
+  },
+  emptyTitle: { fontSize: 15, fontWeight: '700', color: '#0f172a' },
+  emptySub: { fontSize: 12, color: '#64748b', textAlign: 'center', lineHeight: 18 },
 });

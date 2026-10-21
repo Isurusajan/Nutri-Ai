@@ -1,0 +1,138 @@
+export interface AdditiveEntry {
+  code: string;
+  name: string;
+  category: string;
+  riskLevel: 'High Concern' | 'Moderate Concern' | 'Low Concern';
+  commonUses: string;
+  pediatricNotes: string;
+  efsaStatus: string;
+}
+
+export const COMMON_ADDITIVES: AdditiveEntry[] = [
+  {
+    code: 'E102',
+    name: 'Tartrazine',
+    category: 'Artificial Colorant (Azo Dye)',
+    riskLevel: 'High Concern',
+    commonUses: 'Colored chips, snack rings, soft drinks, candy, gelatin',
+    pediatricNotes: 'Southampton trial cocktail. Known triggers for hyperactivity in young children and bronchoconstriction in asthmatics.',
+    efsaStatus: 'Warning label mandatory in EU: "May have an adverse effect on activity and attention in children"',
+  },
+  {
+    code: 'E110',
+    name: 'Sunset Yellow FCF',
+    category: 'Artificial Colorant (Azo Dye)',
+    riskLevel: 'High Concern',
+    commonUses: 'Orange sodas, squashes, confectionery, snack foods',
+    pediatricNotes: 'Forms synergistic hyperactivity cocktail when consumed with Sodium Benzoate (E211). Linked to pediatric hives/urticaria.',
+    efsaStatus: 'EU warning label mandatory; ADI reduced to 1.0 mg/kg bw.',
+  },
+  {
+    code: 'E122',
+    name: 'Carmoisine (Azorubine)',
+    category: 'Artificial Colorant (Azo Dye)',
+    riskLevel: 'High Concern',
+    commonUses: 'Red candies, fruit preserves, packet jellies, baked goods',
+    pediatricNotes: 'Azo dye member of the Southampton trial mixture. Exacerbates hyperactivity and allergic skin reactions in toddlers.',
+    efsaStatus: 'EU warning label mandatory.',
+  },
+  {
+    code: 'E129',
+    name: 'Allura Red AC',
+    category: 'Artificial Colorant (Azo Dye)',
+    riskLevel: 'High Concern',
+    commonUses: 'Flavored milks, breakfast cereals, syrups, sports drinks',
+    pediatricNotes: 'Southampton Mix B additive. Shown to worsen ADHD scores and induce allergic responses.',
+    efsaStatus: 'EU warning label mandatory; banned or restricted in several European nations.',
+  },
+  {
+    code: 'E211',
+    name: 'Sodium Benzoate',
+    category: 'Chemical Preservative',
+    riskLevel: 'High Concern',
+    commonUses: 'Carbonated soft drinks, fruit cordials, sauces, pickles',
+    pediatricNotes: 'Key catalyst in pediatric hyperactivity cocktails. Can decarboxylate into trace benzene in the presence of Vitamin C (E300).',
+    efsaStatus: 'Strict maximum usage limits; subject of global safety re-evaluations.',
+  },
+  {
+    code: 'E220',
+    name: 'Sulfur Dioxide',
+    category: 'Sulfite Preservative',
+    riskLevel: 'High Concern',
+    commonUses: 'Dried fruits, fruit syrups, fruit snacks',
+    pediatricNotes: 'Potent acute bronchospasm trigger in children with asthma. Even low airborne sulfite can induce respiratory distress.',
+    efsaStatus: 'Mandatory allergen declaration regardless of threshold.',
+  },
+  {
+    code: 'E250',
+    name: 'Sodium Nitrite',
+    category: 'Curing Salt / Preservative',
+    riskLevel: 'High Concern',
+    commonUses: 'Cured processed sausages, deli meats, hot dogs',
+    pediatricNotes: 'Can form carcinogenic nitrosamines in gastric acids; infants are vulnerable to methemoglobinemia from nitrite absorption.',
+    efsaStatus: 'Under strict EFSA and WHO surveillance.',
+  },
+  {
+    code: 'E621',
+    name: 'Monosodium Glutamate (MSG)',
+    category: 'Flavor Enhancer',
+    riskLevel: 'Moderate Concern',
+    commonUses: 'Instant noodles, savory crackers, savory chips, bouillons',
+    pediatricNotes: 'High glutamate load can trigger facial flushing, headaches, and sensitivity in children with neurochemical predispositions.',
+    efsaStatus: 'Regulated threshold; prohibited in foods intended exclusively for infants.',
+  },
+  {
+    code: 'E951',
+    name: 'Aspartame',
+    category: 'Artificial Sweetener',
+    riskLevel: 'Moderate Concern',
+    commonUses: 'Diet sodas, sugar-free drinks, chewing gum',
+    pediatricNotes: 'Contains phenylalanine; strictly hazardous to children with phenylketonuria (PKU). Re-evaluated by IARC/WHO in 2023.',
+    efsaStatus: 'Requires mandatory warning: "Contains a source of phenylalanine".',
+  },
+  {
+    code: 'E330',
+    name: 'Citric Acid',
+    category: 'Natural Acidity Regulator',
+    riskLevel: 'Low Concern',
+    commonUses: 'Beverages, canned fruits, candies, jams',
+    pediatricNotes: 'Naturally occurring in citrus. Well tolerated metabolically. High frequent intake in soft drinks can contribute to dental enamel erosion.',
+    efsaStatus: 'Generally recognized as safe (GRAS), no ADI limit.',
+  },
+  {
+    code: 'E160a',
+    name: 'Beta-Carotene',
+    category: 'Natural Provitamin Colorant',
+    riskLevel: 'Low Concern',
+    commonUses: 'Fruit juices, margarines, dairy products, bakery',
+    pediatricNotes: 'Plant-derived precursor of Vitamin A. Safe, non-toxic coloring alternative to synthetic azo dyes for children.',
+    efsaStatus: 'Approved natural colorant with high safety margin.',
+  },
+  {
+    code: 'E162',
+    name: 'Beetroot Red (Betanin)',
+    category: 'Natural Botanical Colorant',
+    riskLevel: 'Low Concern',
+    commonUses: 'Strawberry yogurt, ice cream, confectioneries, jams',
+    pediatricNotes: 'Extracted directly from red beetroot. Non-toxic, non-sensitizing, ideal pediatric alternative to artificial reds.',
+    efsaStatus: 'Approved natural colorant with no ADI ceiling.',
+  },
+  {
+    code: 'E440',
+    name: 'Pectin',
+    category: 'Plant Soluble Fiber Gelling Agent',
+    riskLevel: 'Low Concern',
+    commonUses: 'Fruit jams, yogurt smoothies, jellies',
+    pediatricNotes: 'Naturally extracted from apple pomace and citrus peels. High digestive tolerability; prebiotic benefits.',
+    efsaStatus: 'Approved without numerical ADI limit.',
+  },
+  {
+    code: 'E322',
+    name: 'Lecithins',
+    category: 'Natural Emulsifier',
+    riskLevel: 'Low Concern',
+    commonUses: 'Chocolates, bakery items, infant formulas',
+    pediatricNotes: 'Essential phospholipids derived from sunflower or non-GMO soy. Safe and beneficial for pediatric neural cell membranes.',
+    efsaStatus: 'Generally recognized as safe (GRAS).',
+  },
+];

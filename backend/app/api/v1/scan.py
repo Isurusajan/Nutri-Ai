@@ -1,12 +1,15 @@
 import uuid
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, File, UploadFile, Form
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
+import json
 from app.models.schemas import ScanAssessmentResponse, ChildProfileBase
 from app.services.entity_resolution import ChemicalEntityResolver
 from app.services.interaction_service import InteractionService
 from app.services.risk_scoring import PersonalizedRiskEngine
 from app.services.explainer import SHAPExplainerService
+from app.services.ocr_service import FoodLabelOCRService
+from app.services.ingredient_parser import ingredient_parser_service
 
 router = APIRouter(prefix="/scan", tags=["Food Additive Scanning & Assessment"])
 
@@ -15,6 +18,7 @@ entity_resolver = ChemicalEntityResolver()
 interaction_service = InteractionService()
 risk_engine = PersonalizedRiskEngine(dictionary_lookup=entity_resolver.additives_by_code)
 explainer_service = SHAPExplainerService()
+ocr_service = FoodLabelOCRService()
 
 class TextScanRequest(BaseModel):
     product_name: Optional[str] = Field(default="Packaged Food Item", example="Fizzy Orange Nectar")
@@ -35,6 +39,11 @@ class TextScanRequest(BaseModel):
 
 class BarcodeScanRequest(BaseModel):
     barcode: str = Field(..., example="793573188548")
+    child_profile: Optional[Dict[str, Any]] = None
+
+class Base64ScanRequest(BaseModel):
+    image_base64: str
+    product_name: Optional[str] = "Captured Food Package"
     child_profile: Optional[Dict[str, Any]] = None
 
 @router.post("/text", response_model=ScanAssessmentResponse)
@@ -72,6 +81,12 @@ def scan_ingredients_text(req: TextScanRequest):
         child_profile=req.child_profile
     )
 
+    # 5. Itemized Ingredient Breakdown & Pediatric Classification
+    parsed_ingredients = ingredient_parser_service.parse_and_classify_list(
+        req.raw_ingredients_text,
+        detected_additives
+    )
+
     has_interaction = len(interactions) > 0
     primary_evidence = interactions[0].get("evidence_source") if has_interaction else None
 
@@ -81,6 +96,7 @@ def scan_ingredients_text(req: TextScanRequest):
         product_name=req.product_name,
         input_type="label_ocr",
         detected_additives=detected_additives,
+        parsed_ingredients=parsed_ingredients,
         interaction_detected=has_interaction,
         interaction_evidence_source=primary_evidence,
         risk_score=risk_score,
@@ -125,4 +141,119 @@ def scan_barcode(req: BarcodeScanRequest):
     )
     result = scan_ingredients_text(text_req)
     result.input_type = "barcode_lookup"
+    result.extracted_text = product["ingredients"]
     return result
+
+@router.post("/image", response_model=ScanAssessmentResponse)
+async def scan_label_image(
+    image: UploadFile = File(...),
+    child_profile_json: Optional[str] = Form(None),
+    product_name: Optional[str] = Form("Captured Food Package")
+):
+    """
+    Receives food packaging image uploaded from mobile camera / gallery:
+    1. Preprocesses image using OpenCV (glare reduction, thresholding, contour extraction)
+    2. Performs OCR entity extraction for ingredient lines
+    3. Runs chemical entity resolution, interaction screening, and risk scoring
+    """
+    contents = await image.read()
+    if not contents:
+        raise HTTPException(status_code=400, detail="Uploaded image is empty.")
+
+    try:
+        extracted_text, metrics = await ocr_service.extract_ingredients_text(contents)
+    except Exception as e:
+        raise HTTPException(status_code=422, detail=f"Image processing failed: {str(e)}")
+
+    child_profile = None
+    if child_profile_json:
+        try:
+            child_profile = json.loads(child_profile_json)
+        except Exception:
+            child_profile = None
+
+    # Handle blank paper or image with no detected ingredient text
+    if not extracted_text or not extracted_text.strip():
+        from app.models.schemas import RiskCategory
+        return ScanAssessmentResponse(
+            scan_id=f"SCN-BLANK-{uuid.uuid4().hex[:6].upper()}",
+            child_id=child_profile.get("id") if child_profile else None,
+            product_name="No Ingredient Label Detected",
+            input_type="label_ocr",
+            detected_additives=[],
+            interaction_detected=False,
+            interaction_evidence_source=None,
+            risk_score=0.0,
+            risk_category=RiskCategory.LOW_CONCERN,
+            contributing_factors=[],
+            extracted_text="No readable ingredient text or E-numbers detected on this surface. Please aim the camera at a printed ingredients list.",
+            ocr_metrics=metrics,
+            disclaimer="No food additives detected. Please align the printed ingredients section inside the camera viewfinder."
+        )
+
+    text_req = TextScanRequest(
+        product_name=product_name,
+        raw_ingredients_text=extracted_text,
+        child_profile=child_profile
+    )
+    result = scan_ingredients_text(text_req)
+    result.input_type = "label_ocr"
+    result.extracted_text = extracted_text
+    result.ocr_metrics = metrics
+    return result
+
+@router.post("/image-base64", response_model=ScanAssessmentResponse)
+async def scan_label_image_base64(req: Base64ScanRequest):
+    """
+    Receives base64-encoded food package photo from mobile app.
+    Decodes image bytes, processes via OpenCV + Windows Native OCR,
+    and returns pediatric additive risk assessment.
+    """
+    import base64
+    raw_b64 = req.image_base64
+    if "," in raw_b64:
+        raw_b64 = raw_b64.split(",", 1)[1]
+    
+    try:
+        contents = base64.b64decode(raw_b64)
+    except Exception as b64_err:
+        raise HTTPException(status_code=400, detail=f"Invalid base64 encoding: {str(b64_err)}")
+
+    if not contents:
+        raise HTTPException(status_code=400, detail="Uploaded image data is empty.")
+
+    try:
+        extracted_text, metrics = await ocr_service.extract_ingredients_text(contents)
+    except Exception as e:
+        raise HTTPException(status_code=422, detail=f"Image processing failed: {str(e)}")
+
+    # Blank paper or surface with no readable ingredients
+    if not extracted_text or not extracted_text.strip():
+        from app.models.schemas import RiskCategory
+        return ScanAssessmentResponse(
+            scan_id=f"SCN-BLANK-{uuid.uuid4().hex[:6].upper()}",
+            child_id=req.child_profile.get("id") if req.child_profile else None,
+            product_name="No Ingredient Label Detected",
+            input_type="label_ocr",
+            detected_additives=[],
+            interaction_detected=False,
+            interaction_evidence_source=None,
+            risk_score=0.0,
+            risk_category=RiskCategory.LOW_CONCERN,
+            contributing_factors=[],
+            extracted_text="No readable ingredient text or E-numbers detected on this surface. Please aim the camera at a printed ingredients list.",
+            ocr_metrics=metrics,
+            disclaimer="No food additives detected. Please align the printed ingredients section inside the camera viewfinder."
+        )
+
+    text_req = TextScanRequest(
+        product_name=req.product_name,
+        raw_ingredients_text=extracted_text,
+        child_profile=req.child_profile
+    )
+    result = scan_ingredients_text(text_req)
+    result.input_type = "label_ocr"
+    result.extracted_text = extracted_text
+    result.ocr_metrics = metrics
+    return result
+

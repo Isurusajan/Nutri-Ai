@@ -39,17 +39,27 @@ class SHAPExplanationFactor(BaseModel):
     relative_weight: float # e.g. 0.42
     plain_text_explanation: str
 
+class ParsedIngredientItem(BaseModel):
+    name: str
+    category: str # "Whole Food", "Protein Source", "Natural Sweetener", "Additive Concern", etc.
+    status: str # "safe", "caution", "concerning"
+    health_note: str # Pediatric insight
+    e_code: Optional[str] = None
+
 class ScanAssessmentResponse(BaseModel):
     scan_id: str
     child_id: Optional[str]
     product_name: Optional[str]
     input_type: str # "label_ocr" or "barcode_lookup"
     detected_additives: List[AdditiveDetail]
+    parsed_ingredients: List[ParsedIngredientItem] = []
     interaction_detected: bool
     interaction_evidence_source: Optional[str]
     risk_score: float = Field(..., ge=0, le=100, description="Personalized risk score 0-100")
     risk_category: RiskCategory
     contributing_factors: List[SHAPExplanationFactor]
+    extracted_text: Optional[str] = None
+    ocr_metrics: Optional[Dict[str, Any]] = None
     disclaimer: str = (
         "Screening result for decision support only. Does not measure biological toxicity "
         "or replace professional pediatric medical diagnosis."
